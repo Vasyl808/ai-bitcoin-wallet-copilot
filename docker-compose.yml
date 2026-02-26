@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_GROQ_API_KEY=${VITE_GROQ_API_KEY}
+    ports:
+      - "3000:80"
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # Dev mode (hot reload) - use: docker-compose --profile dev up dev
+  dev:
+    profiles: ["dev"]
+    image: node:20
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_GROQ_API_KEY=${VITE_GROQ_API_KEY}
+    command: sh -c "npm install --legacy-peer-deps --no-audit --no-fund --loglevel verbose && npm run dev -- --host 0.0.0.0"
